@@ -1,0 +1,621 @@
+// ============================================================================
+// 📊 SCRIPT DAX — KPIs CERTAMEN RRHH
+// ============================================================================
+// Tabla de datos: Sheet1
+// (Renómbrala a "Datos" en Power BI para que las fórmulas funcionen,
+//  o reemplaza "Datos" por "Sheet1" en todas las medidas)
+//
+// 📋 INSTRUCCIONES DE USO:
+// ─────────────────────────────────────────────────────────────────────────────
+// OPCIÓN 1 — Tabular Editor (recomendado para importación masiva):
+//   1. Abre tu archivo .pbix en Power BI Desktop
+//   2. Abre Tabular Editor 3 (gratuito) → File → Open → From DB
+//   3. Pega cada bloque de medida en el editor
+//   4. Guarda y cierra Tabular Editor
+//
+// OPCIÓN 2 — Power BI Desktop (manual, medida por medida):
+//   1. Ve a la pestaña "Modeling" → "New Measure"
+//   2. Pega la fórmula (sin el nombre, solo desde el "=")
+//   3. Renombra la medida con el nombre indicado
+//
+// OPCIÓN 3 — DAX Studio:
+//   1. Conéctate a tu modelo desde DAX Studio
+//   2. Usa la función de scripting para importar medidas
+// ============================================================================
+
+
+// ╔═══════════════════════════════════════════════════════════════════════════╗
+// ║  PASO 0: COLUMNAS CALCULADAS (crear ANTES de las medidas)               ║
+// ╚═══════════════════════════════════════════════════════════════════════════╝
+// En Power BI Desktop: Modeling → New Column → pegar fórmula
+
+// --- Antigüedad en años ---
+Antiguedad_Anios = 
+    DATEDIFF(Datos[Fecha_Ingreso], TODAY(), YEAR)
+
+// --- Rango de Antigüedad (segmentación) ---
+Rango_Antiguedad = 
+    SWITCH(
+        TRUE(),
+        Datos[Antiguedad_Anios] < 1, "< 1 año",
+        Datos[Antiguedad_Anios] < 3, "1-3 años",
+        Datos[Antiguedad_Anios] < 6, "3-6 años",
+        Datos[Antiguedad_Anios] < 10, "6-10 años",
+        "10+ años"
+    )
+
+// --- Rango de Edad (segmentación) ---
+Rango_Edad = 
+    SWITCH(
+        TRUE(),
+        Datos[Edad_Reportada] <= 25, "18-25",
+        Datos[Edad_Reportada] <= 35, "26-35",
+        Datos[Edad_Reportada] <= 45, "36-45",
+        Datos[Edad_Reportada] <= 55, "46-55",
+        "56+"
+    )
+
+// --- Variación Desempeño (delta entre evaluaciones) ---
+Delta_Desempeno = 
+    Datos[Evaluacion_Desempeno] - Datos[Evaluacion_Anterior]
+
+// --- Flag: Sin Capacitación ---
+Flag_Sin_Capacitacion = 
+    IF(
+        ISBLANK(Datos[Ultima_Capacitacion_Fecha]),
+        "Sin capacitación",
+        "Con capacitación"
+    )
+
+
+// ╔═══════════════════════════════════════════════════════════════════════════╗
+// ║  1. DOTACIÓN                                                            ║
+// ╚═══════════════════════════════════════════════════════════════════════════╝
+
+// --- 1.1 Headcount (empleados activos) ---
+Headcount = 
+    COUNTROWS(
+        FILTER(Datos, Datos[Estado] = "Activo")
+    )
+
+// --- 1.2 Total Empleados (activos + desvinculados) ---
+Total Empleados = 
+    COUNTROWS(Datos)
+
+// --- 1.3 Total Desvinculados ---
+Total Desvinculados = 
+    COUNTROWS(
+        FILTER(Datos, Datos[Estado] = "Desvinculado")
+    )
+
+// --- 1.4 Headcount por Área (usar con slicer de Área) ---
+Headcount Area = 
+    CALCULATE(
+        [Headcount],
+        ALLEXCEPT(Datos, Datos[Area])
+    )
+
+// --- 1.5 Headcount por Sede (usar con slicer de Sede) ---
+Headcount Sede = 
+    CALCULATE(
+        [Headcount],
+        ALLEXCEPT(Datos, Datos[Sede])
+    )
+
+// --- 1.6 % de Dotación por Nivel ---
+% Dotacion por Nivel = 
+    DIVIDE(
+        COUNTROWS(FILTER(Datos, Datos[Estado] = "Activo")),
+        CALCULATE(
+            COUNTROWS(FILTER(Datos, Datos[Estado] = "Activo")),
+            ALL(Datos[Nivel])
+        ),
+        0
+    )
+
+// --- 1.7 Distribución por Tipo de Contrato ---
+% Tipo Contrato = 
+    DIVIDE(
+        COUNTROWS(Datos),
+        CALCULATE(COUNTROWS(Datos), ALL(Datos[Tipo_Contrato])),
+        0
+    )
+
+// --- 1.8 Distribución por Jornada ---
+% Jornada = 
+    DIVIDE(
+        COUNTROWS(Datos),
+        CALCULATE(COUNTROWS(Datos), ALL(Datos[Jornada])),
+        0
+    )
+
+// --- 1.9 Distribución por Modalidad ---
+% Modalidad = 
+    DIVIDE(
+        COUNTROWS(Datos),
+        CALCULATE(COUNTROWS(Datos), ALL(Datos[Modalidad_Trabajo])),
+        0
+    )
+
+
+// ╔═══════════════════════════════════════════════════════════════════════════╗
+// ║  2. ROTACIÓN                                                            ║
+// ╚═══════════════════════════════════════════════════════════════════════════╝
+
+// --- 2.1 Tasa de Rotación Global ---
+Tasa Rotacion Global = 
+    DIVIDE(
+        COUNTROWS(FILTER(Datos, Datos[Estado] = "Desvinculado")),
+        COUNTROWS(Datos),
+        0
+    )
+
+// --- 2.2 Tasa Rotación Voluntaria ---
+Tasa Rotacion Voluntaria = 
+    DIVIDE(
+        COUNTROWS(
+            FILTER(Datos, 
+                Datos[Estado] = "Desvinculado" && 
+                Datos[Tipo_Rotacion] = "Voluntaria"
+            )
+        ),
+        COUNTROWS(FILTER(Datos, Datos[Estado] = "Desvinculado")),
+        0
+    )
+
+// --- 2.3 Tasa Rotación Involuntaria ---
+Tasa Rotacion Involuntaria = 
+    DIVIDE(
+        COUNTROWS(
+            FILTER(Datos, 
+                Datos[Estado] = "Desvinculado" && 
+                Datos[Tipo_Rotacion] = "Involuntaria"
+            )
+        ),
+        COUNTROWS(FILTER(Datos, Datos[Estado] = "Desvinculado")),
+        0
+    )
+
+// --- 2.4 Desvinculados por Motivo (para barras, usar con slicer Motivo_Salida) ---
+Desvinculados por Motivo = 
+    CALCULATE(
+        COUNTROWS(FILTER(Datos, Datos[Estado] = "Desvinculado")),
+        ALLEXCEPT(Datos, Datos[Motivo_Salida])
+    )
+
+// --- 2.5 Tasa Rotación por Área ---
+Tasa Rotacion Area = 
+    VAR _desvinculados = 
+        COUNTROWS(
+            FILTER(Datos, 
+                Datos[Estado] = "Desvinculado"
+            )
+        )
+    VAR _total = COUNTROWS(Datos)
+    RETURN
+        DIVIDE(_desvinculados, _total, 0)
+
+// --- 2.6 Tasa Rotación por Sede ---
+Tasa Rotacion Sede = 
+    VAR _desvinculados = 
+        COUNTROWS(
+            FILTER(Datos, Datos[Estado] = "Desvinculado")
+        )
+    VAR _total = COUNTROWS(Datos)
+    RETURN
+        DIVIDE(_desvinculados, _total, 0)
+
+// --- 2.7 Índice de Reemplazo ---
+Indice Reemplazo = 
+    DIVIDE(
+        COUNTROWS(
+            FILTER(Datos, 
+                Datos[Estado] = "Desvinculado" && 
+                Datos[Reemplazo] = "Sí"
+            )
+        ),
+        COUNTROWS(FILTER(Datos, Datos[Estado] = "Desvinculado")),
+        0
+    )
+
+
+// ╔═══════════════════════════════════════════════════════════════════════════╗
+// ║  3. EQUIDAD SALARIAL                                                    ║
+// ╚═══════════════════════════════════════════════════════════════════════════╝
+
+// --- 3.1 Sueldo Base Promedio ---
+Sueldo Base Promedio = 
+    AVERAGE(Datos[Sueldo_Base])
+
+// --- 3.2 Sueldo Base Mediana ---
+Sueldo Base Mediana = 
+    MEDIAN(Datos[Sueldo_Base])
+
+// --- 3.3 Sueldo Total Promedio ---
+Sueldo Total Promedio = 
+    AVERAGE(Datos[Sueldo_Total_Reportado])
+
+// --- 3.4 Bono Variable Promedio ---
+Bono Variable Promedio = 
+    AVERAGE(Datos[Bono_Variable])
+
+// --- 3.5 Brecha Salarial de Género (Hombres vs Mujeres) ---
+Brecha Salarial Genero = 
+    VAR _sueldoH = 
+        CALCULATE(
+            AVERAGE(Datos[Sueldo_Base]),
+            Datos[Sexo] = "M"
+        )
+    VAR _sueldoM = 
+        CALCULATE(
+            AVERAGE(Datos[Sueldo_Base]),
+            Datos[Sexo] = "F"
+        )
+    RETURN
+        DIVIDE(_sueldoH - _sueldoM, _sueldoH, 0)
+
+// --- 3.6 Brecha Salarial Absoluta (CLP) ---
+Brecha Salarial Absoluta CLP = 
+    VAR _sueldoH = 
+        CALCULATE(AVERAGE(Datos[Sueldo_Base]), Datos[Sexo] = "M")
+    VAR _sueldoM = 
+        CALCULATE(AVERAGE(Datos[Sueldo_Base]), Datos[Sexo] = "F")
+    RETURN
+        _sueldoH - _sueldoM
+
+// --- 3.7 Ratio Bono/Sueldo Base ---
+Ratio Bono Sueldo = 
+    DIVIDE(
+        AVERAGE(Datos[Bono_Variable]),
+        AVERAGE(Datos[Sueldo_Base]),
+        0
+    )
+
+// --- 3.8 Sueldo Promedio por Género (usar con slicer Sexo) ---
+Sueldo Promedio Genero = 
+    CALCULATE(
+        AVERAGE(Datos[Sueldo_Base]),
+        ALLEXCEPT(Datos, Datos[Sexo])
+    )
+
+// --- 3.9 Sueldo Promedio por Nivel (usar con slicer Nivel) ---
+Sueldo Promedio Nivel = 
+    CALCULATE(
+        AVERAGE(Datos[Sueldo_Base]),
+        ALLEXCEPT(Datos, Datos[Nivel])
+    )
+
+// --- 3.10 Masa Salarial Total (activos) ---
+Masa Salarial Total = 
+    CALCULATE(
+        SUM(Datos[Sueldo_Total_Reportado]),
+        Datos[Estado] = "Activo"
+    )
+
+
+// ╔═══════════════════════════════════════════════════════════════════════════╗
+// ║  4. CAPACITACIÓN                                                        ║
+// ╚═══════════════════════════════════════════════════════════════════════════╝
+
+// --- 4.1 Promedio Horas Capacitación ---
+Promedio Horas Capacitacion = 
+    AVERAGE(Datos[Horas_Capacitacion])
+
+// --- 4.2 Total Horas Capacitación ---
+Total Horas Capacitacion = 
+    SUM(Datos[Horas_Capacitacion])
+
+// --- 4.3 Promedio Cursos Tomados ---
+Promedio Cursos Tomados = 
+    AVERAGE(Datos[Cursos_Tomados])
+
+// --- 4.4 Cobertura de Capacitación (% con al menos 1 hora) ---
+Cobertura Capacitacion = 
+    DIVIDE(
+        COUNTROWS(
+            FILTER(Datos, Datos[Horas_Capacitacion] > 0)
+        ),
+        COUNTROWS(Datos),
+        0
+    )
+
+// --- 4.5 % Empleados Sin Capacitación ---
+% Sin Capacitacion = 
+    DIVIDE(
+        COUNTROWS(
+            FILTER(Datos, Datos[Horas_Capacitacion] = 0)
+        ),
+        COUNTROWS(Datos),
+        0
+    )
+
+// --- 4.6 Inversión en Capacitación por Tipo (con slicer Tipo_Capacitacion) ---
+Empleados por Tipo Capacitacion = 
+    CALCULATE(
+        COUNTROWS(Datos),
+        ALLEXCEPT(Datos, Datos[Tipo_Capacitacion])
+    )
+
+// --- 4.7 Horas Capacitación por Área ---
+Horas Capacitacion Area = 
+    CALCULATE(
+        AVERAGE(Datos[Horas_Capacitacion]),
+        ALLEXCEPT(Datos, Datos[Area])
+    )
+
+// --- 4.8 Correlación Capacitación-Desempeño (proxy) ---
+Horas Cap Alto Desempeno = 
+    CALCULATE(
+        AVERAGE(Datos[Horas_Capacitacion]),
+        Datos[Evaluacion_Desempeno] >= 4
+    )
+
+Horas Cap Bajo Desempeno = 
+    CALCULATE(
+        AVERAGE(Datos[Horas_Capacitacion]),
+        Datos[Evaluacion_Desempeno] < 3
+    )
+
+
+// ╔═══════════════════════════════════════════════════════════════════════════╗
+// ║  5. DESEMPEÑO                                                           ║
+// ╚═══════════════════════════════════════════════════════════════════════════╝
+
+// --- 5.1 Evaluación Desempeño Promedio ---
+Evaluacion Promedio = 
+    AVERAGE(Datos[Evaluacion_Desempeno])
+
+// --- 5.2 Evaluación Anterior Promedio ---
+Evaluacion Anterior Promedio = 
+    AVERAGE(Datos[Evaluacion_Anterior])
+
+// --- 5.3 Variación Desempeño Promedio (delta) ---
+Variacion Desempeno Promedio = 
+    AVERAGE(Datos[Evaluacion_Desempeno]) - AVERAGE(Datos[Evaluacion_Anterior])
+
+// --- 5.4 % Alto Desempeño (>=4) ---
+% Alto Desempeno = 
+    DIVIDE(
+        COUNTROWS(
+            FILTER(Datos, Datos[Evaluacion_Desempeno] >= 4)
+        ),
+        COUNTROWS(Datos),
+        0
+    )
+
+// --- 5.5 % Bajo Desempeño (<3) ---
+% Bajo Desempeno = 
+    DIVIDE(
+        COUNTROWS(
+            FILTER(Datos, Datos[Evaluacion_Desempeno] < 3)
+        ),
+        COUNTROWS(Datos),
+        0
+    )
+
+// --- 5.6 % Mejoraron vs Evaluación Anterior ---
+% Mejoraron Desempeno = 
+    DIVIDE(
+        COUNTROWS(
+            FILTER(Datos, Datos[Evaluacion_Desempeno] > Datos[Evaluacion_Anterior])
+        ),
+        COUNTROWS(Datos),
+        0
+    )
+
+// --- 5.7 % Empeoraron vs Evaluación Anterior ---
+% Empeoraron Desempeno = 
+    DIVIDE(
+        COUNTROWS(
+            FILTER(Datos, Datos[Evaluacion_Desempeno] < Datos[Evaluacion_Anterior])
+        ),
+        COUNTROWS(Datos),
+        0
+    )
+
+// --- 5.8 Engagement Promedio ---
+Engagement Promedio = 
+    AVERAGE(Datos[Engagement])
+
+// --- 5.9 Distribución Potencial: Alto ---
+% Potencial Alto = 
+    DIVIDE(
+        COUNTROWS(FILTER(Datos, Datos[Potencial] = "Alto")),
+        COUNTROWS(Datos),
+        0
+    )
+
+// --- 5.10 9-Box: Alto Desempeño + Alto Potencial (Stars) ---
+9Box Stars = 
+    COUNTROWS(
+        FILTER(Datos,
+            Datos[Evaluacion_Desempeno] >= 4 &&
+            Datos[Potencial] = "Alto"
+        )
+    )
+
+// --- 5.11 9-Box: Bajo Desempeño + Bajo Potencial (Riesgo) ---
+9Box Riesgo = 
+    COUNTROWS(
+        FILTER(Datos,
+            Datos[Evaluacion_Desempeno] < 3 &&
+            Datos[Potencial] = "Bajo"
+        )
+    )
+
+// --- 5.12 Ausentismo Promedio (días) ---
+Ausentismo Promedio = 
+    AVERAGE(Datos[Ausentismo_Dias])
+
+// --- 5.13 Tasa Accidentabilidad ---
+Tasa Accidentabilidad = 
+    DIVIDE(
+        COUNTROWS(FILTER(Datos, Datos[Accidentes_Laborales] > 0)),
+        COUNTROWS(Datos),
+        0
+    )
+
+// --- 5.14 Accidentes Promedio ---
+Accidentes Promedio = 
+    AVERAGE(Datos[Accidentes_Laborales])
+
+
+// ╔═══════════════════════════════════════════════════════════════════════════╗
+// ║  6. DIVERSIDAD E INCLUSIÓN                                              ║
+// ╚═══════════════════════════════════════════════════════════════════════════╝
+
+// --- 6.1 % Mujeres ---
+% Mujeres = 
+    DIVIDE(
+        COUNTROWS(FILTER(Datos, Datos[Sexo] = "F")),
+        COUNTROWS(Datos),
+        0
+    )
+
+// --- 6.2 % Hombres ---
+% Hombres = 
+    DIVIDE(
+        COUNTROWS(FILTER(Datos, Datos[Sexo] = "M")),
+        COUNTROWS(Datos),
+        0
+    )
+
+// --- 6.3 % Otro Género ---
+% Otro Genero = 
+    DIVIDE(
+        COUNTROWS(FILTER(Datos, Datos[Sexo] = "Otro")),
+        COUNTROWS(Datos),
+        0
+    )
+
+// --- 6.4 Índice de Diversidad de Género (1 = paridad perfecta) ---
+Indice Paridad Genero = 
+    VAR _mujeres = COUNTROWS(FILTER(Datos, Datos[Sexo] = "F"))
+    VAR _hombres = COUNTROWS(FILTER(Datos, Datos[Sexo] = "M"))
+    RETURN
+        DIVIDE(MIN(_mujeres, _hombres), MAX(_mujeres, _hombres), 0)
+
+// --- 6.5 Cantidad de Nacionalidades Distintas ---
+Nacionalidades Distintas = 
+    DISTINCTCOUNT(Datos[Nacionalidad])
+
+// --- 6.6 % Extranjeros (no chilenos) ---
+% Extranjeros = 
+    DIVIDE(
+        COUNTROWS(FILTER(Datos, Datos[Nacionalidad] <> "Chilena")),
+        COUNTROWS(Datos),
+        0
+    )
+
+// --- 6.7 % Con Discapacidad ---
+% Con Discapacidad = 
+    DIVIDE(
+        COUNTROWS(FILTER(Datos, Datos[Discapacidad] = "Sí")),
+        COUNTROWS(Datos),
+        0
+    )
+
+// --- 6.8 Brecha Salarial Género por Nivel (usar con slicer Nivel) ---
+Brecha Salarial Genero Nivel = 
+    VAR _sueldoH = 
+        CALCULATE(AVERAGE(Datos[Sueldo_Base]), Datos[Sexo] = "M")
+    VAR _sueldoM = 
+        CALCULATE(AVERAGE(Datos[Sueldo_Base]), Datos[Sexo] = "F")
+    RETURN
+        DIVIDE(_sueldoH - _sueldoM, _sueldoH, 0)
+
+// --- 6.9 % Mujeres en Nivel Gerencia ---
+% Mujeres Gerencia = 
+    DIVIDE(
+        COUNTROWS(
+            FILTER(Datos, 
+                Datos[Sexo] = "F" && 
+                Datos[Nivel] = "Gerencia"
+            )
+        ),
+        COUNTROWS(FILTER(Datos, Datos[Nivel] = "Gerencia")),
+        0
+    )
+
+// --- 6.10 % Mujeres en Nivel Jefatura ---
+% Mujeres Jefatura = 
+    DIVIDE(
+        COUNTROWS(
+            FILTER(Datos, 
+                Datos[Sexo] = "F" && 
+                Datos[Nivel] = "Jefatura"
+            )
+        ),
+        COUNTROWS(FILTER(Datos, Datos[Nivel] = "Jefatura")),
+        0
+    )
+
+// --- 6.11 Techo de Cristal Index ---
+// Ratio de mujeres en niveles altos vs. mujeres en total
+Techo de Cristal = 
+    VAR _mujeresLiderazgo = 
+        COUNTROWS(
+            FILTER(Datos, 
+                Datos[Sexo] = "F" && 
+                Datos[Nivel] IN {"Gerencia", "Subgerencia", "Jefatura"}
+            )
+        )
+    VAR _totalLiderazgo = 
+        COUNTROWS(
+            FILTER(Datos, 
+                Datos[Nivel] IN {"Gerencia", "Subgerencia", "Jefatura"}
+            )
+        )
+    VAR _mujeresTotal = COUNTROWS(FILTER(Datos, Datos[Sexo] = "F"))
+    VAR _total = COUNTROWS(Datos)
+    RETURN
+        DIVIDE(
+            DIVIDE(_mujeresLiderazgo, _totalLiderazgo, 0),
+            DIVIDE(_mujeresTotal, _total, 0),
+            0
+        )
+
+
+// ╔═══════════════════════════════════════════════════════════════════════════╗
+// ║  7. KPIs EJECUTIVOS (TARJETAS RESUMEN)                                  ║
+// ╚═══════════════════════════════════════════════════════════════════════════╝
+
+// --- 7.1 KPI Card: Headcount con ícono ---
+KPI Headcount = 
+    "👥 " & FORMAT([Headcount], "#,##0")
+
+// --- 7.2 KPI Card: Tasa Rotación ---
+KPI Rotacion = 
+    "🔄 " & FORMAT([Tasa Rotacion Global], "0.0%")
+
+// --- 7.3 KPI Card: Brecha Salarial ---
+KPI Brecha = 
+    "💰 " & FORMAT([Brecha Salarial Genero], "0.0%")
+
+// --- 7.4 KPI Card: Evaluación Promedio ---
+KPI Evaluacion = 
+    "⭐ " & FORMAT([Evaluacion Promedio], "0.00") & " / 5.0"
+
+// --- 7.5 KPI Card: Engagement ---
+KPI Engagement = 
+    "💪 " & FORMAT([Engagement Promedio], "0.0")
+
+// --- 7.6 KPI Card: Cobertura Capacitación ---
+KPI Capacitacion = 
+    "📚 " & FORMAT([Cobertura Capacitacion], "0.0%")
+
+
+// ============================================================================
+// FIN DEL SCRIPT
+// ============================================================================
+// Total: 5 columnas calculadas + 55 medidas DAX
+// Organizadas en 7 secciones:
+//   0. Columnas Calculadas (5)
+//   1. Dotación (9 medidas)
+//   2. Rotación (7 medidas)
+//   3. Equidad Salarial (10 medidas)
+//   4. Capacitación (8 medidas)
+//   5. Desempeño (14 medidas)
+//   6. Diversidad e Inclusión (11 medidas)
+//   7. KPIs Ejecutivos (6 medidas)
+// ============================================================================

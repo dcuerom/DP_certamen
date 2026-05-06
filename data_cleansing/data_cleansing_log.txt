@@ -1,0 +1,82 @@
+============================================================
+DATA CLEANSING — 2026-05-03 01:20:39
+============================================================
+Archivo fuente : Base datos CERTAMEN2.xlsx
+Registros      : 10000
+Columnas       : 44
+
+─── 1. Estandarizar campo 'Sexo' ───
+  Antes : {'M': 4901, 'F': 4532, 'Otro': 201, nan: 93, 'male': 82, 'female': 67, 'Femenino': 62, 'Masculino': 62}
+  Después: {'M': 5045, 'F': 4661, 'Otro': 201, nan: 93}
+  → 273 valores remapeados
+
+─── 2. Normalizar campo 'Area' ───
+  Antes : 13 categorías
+  Después: 7 categorías → ['Operaciones', 'Tecnología', 'Comercial', 'Finanzas', 'Personas', 'Administración', nan]
+  → 350 valores remapeados
+
+─── 3. Corregir Sueldo_Total_Reportado ───
+  3a. Sueldo_Base imputado desde (Total - Bono): 94 registros
+  3b. Sueldo_Total recalculado (Base + Bono): 451 registros corregidos
+
+─── 4. Resolver Activos con Fecha_Salida ───
+  4a. Activos con Motivo_Salida → reclasificados a Desvinculado: 25
+  4b. Activos sin Motivo_Salida → Fecha_Salida limpiada: 207
+  Total afectados: 232
+
+─── 5. Eliminar RUTs duplicados ───
+  RUTs duplicados encontrados: 224 RUTs con múltiples registros
+  Registros eliminados: 231
+  Registros restantes: 9769
+
+─── 6. Corregir fechas invertidas ───
+  Fechas intercambiadas (Ingreso ↔ Salida): 34 registros
+
+─── 7. Convertir registros en USD a CLP ───
+  Sueldo_Base promedio USD: 1,635,967
+  Sueldo_Base promedio CLP: 1,799,679
+  ⚠ Los montos en 'USD' tienen magnitud de CLP → se corrige solo la etiqueta Moneda
+  → 79 registros: Moneda 'USD' → 'CLP' (montos sin conversión)
+
+─── 8. Corregir ausentismo negativo ───
+  Ausentismo negativo → valor absoluto: 76 registros
+
+─── 9. Imputar nulos en variables clave ───
+  9b. Engagement imputado (mediana Área): 361
+  9c. Horas_Capacitacion imputado (mediana Nivel): 602
+  9d. Cursos_Tomados imputado (mediana Nivel): 590
+  9e. Evaluacion_Desempeno imputado (mediana Nivel): 50
+  9f. Evaluacion_Anterior imputado (mediana Nivel): 768
+  9g. Sexo imputado desde Genero_Declarado: 89
+  9h. Ausentismo_Dias imputado (mediana global): 54
+  9i. Fecha_Nacimiento nulos restantes (no imputables sin dato externo): 11
+
+─── 10. Homologar escala de evaluación ───
+  Eval. Desempeño rango actual: [0.0, 6.0]
+  Eval. Anterior rango actual: [1.0, 5.0]
+  Mapeo lineal aplicado: [0,6] → [1,5]
+  Nuevo rango: [1.00, 5.00]
+  Registros en 0 originalmente: 45, en >5: 88
+
+─── Extra. Recalcular Edad_Reportada ───
+  Edad recalculada para 9758 registros (ref: 2026-05-01)
+
+─── Resumen de nulos post-limpieza ───
+  Tipo_Rotacion: 8071 (82.6%)
+  Motivo_Salida: 7973 (81.6%)
+  Fecha_Salida: 7973 (81.6%)
+  Reemplazo: 7973 (81.6%)
+  Observaciones: 3216 (32.9%)
+  Ultima_Capacitacion_Fecha: 2052 (21.0%)
+  Tipo_Capacitacion: 2052 (21.0%)
+  Feedback_360: 274 (2.8%)
+  Discapacidad: 198 (2.0%)
+  Beneficios: 196 (2.0%)
+  Genero_Declarado: 61 (0.6%)
+  Modalidad_Trabajo: 15 (0.2%)
+  Area: 13 (0.1%)
+  Engagement: 13 (0.1%)
+  Fecha_Nacimiento: 11 (0.1%)
+
+─── Guardando archivo limpio ───
+  → Base_datos_CERTAMEN2_clean.xlsx (9769 registros, 44 columnas)
