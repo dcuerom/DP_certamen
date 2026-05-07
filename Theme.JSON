@@ -1,0 +1,35 @@
+{
+  "name": "RRHH Dashboard Azulado",
+  "dataColors": [
+    "#1B2A4A",
+    "#2E5C8A",
+    "#4A90D9",
+    "#00B4D8",
+    "#87CEEB",
+    "#27AE60",
+    "#E74C3C",
+    "#F39C12"
+  ],
+  "background": "#F0F4F8",
+  "foreground": "#2C3E50",
+  "tableAccent": "#2E5C8A",
+  "visualStyles": {
+    "*": {
+      "*": {
+        "general": [{
+          "responsive": true
+        }],
+        "title": [{
+          "fontColor": {"solid": {"color": "#2C3E50"}},
+          "fontSize": 12,
+          "fontFamily": "Segoe UI"
+        }],
+        "labels": [{
+          "fontColor": {"solid": {"color": "#2C3E50"}},
+          "fontSize": 10,
+          "fontFamily": "Segoe UI"
+        }]
+      }
+    }
+  }
+}
