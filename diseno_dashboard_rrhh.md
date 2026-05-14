@@ -136,7 +136,6 @@ El dashboard se organiza en **6 páginas** alineadas a los 6 procesos RRHH del c
 
 ![1778092733758](image/diseno_dashboard_rrhh/1778092733758.png)
 
-
 ---
 
 ## 📄 Página 5: Desempeño y Talento
