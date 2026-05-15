@@ -10,14 +10,14 @@
 
 El proceso de **Desempeño y Talento** fue seleccionado por ser el de mayor densidad relacional dentro del modelo de datos. Cuenta con **14 medidas DAX** ya definidas y permite cruces directos con al menos **12 variables** de la base:
 
-| Variable Principal         | Variables con las que se cruza                                                              |
-| -------------------------- | ------------------------------------------------------------------------------------------- |
-| `Evaluacion_Desempeno`     | Área, Nivel, Sede, Sexo, Antigüedad, Sueldo, Horas Capacitación, Engagement              |
-| `Evaluacion_Anterior`      | Delta de mejora/deterioro, segmentación temporal                                           |
-| `Potencial`                | Matriz 9-Box, planes de sucesión, retención de talento                                    |
-| `Engagement`               | Ausentismo, Accidentabilidad, Rotación, Satisfacción                                      |
-| `Ausentismo_Dias`          | Desempeño, Área, Sede, Tipo de Contrato                                                   |
-| `Accidentes_Laborales`     | Área, Sede, Jornada, Modalidad de Trabajo                                                  |
+| Variable Principal       | Variables con las que se cruza                                                 |
+| ------------------------ | ------------------------------------------------------------------------------ |
+| `Evaluacion_Desempeno` | Área, Nivel, Sede, Sexo, Antigüedad, Sueldo, Horas Capacitación, Engagement |
+| `Evaluacion_Anterior`  | Delta de mejora/deterioro, segmentación temporal                              |
+| `Potencial`            | Matriz 9-Box, planes de sucesión, retención de talento                       |
+| `Engagement`           | Ausentismo, Accidentabilidad, Rotación, Satisfacción                         |
+| `Ausentismo_Dias`      | Desempeño, Área, Sede, Tipo de Contrato                                      |
+| `Accidentes_Laborales` | Área, Sede, Jornada, Modalidad de Trabajo                                     |
 
 **Argumento estratégico:** El desempeño es el eje vertebral de la gestión de personas — un colaborador con bajo desempeño impacta en rotación, costos salariales, productividad y clima. Profundizar aquí permite generar recomendaciones accionables con mayor ROI organizacional.
 
@@ -27,23 +27,23 @@ El proceso de **Desempeño y Talento** fue seleccionado por ser el de mayor dens
 
 ### 2.1 Filtros Globales (presentes en todas las páginas)
 
-| Filtro              | Tipo       | Valores                                                  | Propósito                            |
-| ------------------- | ---------- | -------------------------------------------------------- | ------------------------------------ |
-| **Área**            | Dropdown   | Todas las áreas de la organización                       | Comparación inter-departamental      |
-| **Nivel**           | Multi-sel  | Operativo, Analista, Prof. Senior, Jefatura, Gerencia... | Análisis por estrato jerárquico      |
-| **Sede**            | Dropdown   | Santiago, Valparaíso, Puerto Montt, etc.                 | Dimensión geográfica                 |
-| **Estado**          | Botones    | Activo / Desvinculado                                    | Incluir/excluir ex-empleados         |
+| Filtro           | Tipo      | Valores                                                  | Propósito                        |
+| ---------------- | --------- | -------------------------------------------------------- | --------------------------------- |
+| **Área**  | Dropdown  | Todas las áreas de la organización                     | Comparación inter-departamental  |
+| **Nivel**  | Multi-sel | Operativo, Analista, Prof. Senior, Jefatura, Gerencia... | Análisis por estrato jerárquico |
+| **Sede**   | Dropdown  | Santiago, Valparaíso, Puerto Montt, etc.                | Dimensión geográfica            |
+| **Estado** | Botones   | Activo / Desvinculado                                    | Incluir/excluir ex-empleados      |
 
 ### 2.2 Filtros Específicos del Análisis de Desempeño
 
-| Filtro                   | Tipo      | Valores                              | Propósito                                       |
-| ------------------------ | --------- | ------------------------------------ | ----------------------------------------------- |
-| **Potencial**            | Botones   | Alto / Medio / Bajo                  | Segmentar por potencial de crecimiento          |
-| **Rango Antigüedad**    | Lista     | <1, 1-3, 3-6, 6-10, 10+ años       | Correlacionar experiencia con rendimiento       |
-| **Rango Edad**           | Lista     | 18-25, 26-35, 36-45, 46-55, 56+     | Análisis generacional                           |
-| **Tipo Capacitación**   | Dropdown  | Interna, Externa, Mixta              | Impacto del tipo de formación en desempeño     |
-| **Sexo**                 | Botones   | M / F / Otro                         | Equidad en evaluaciones                         |
-| **Modalidad Trabajo**    | Botones   | Presencial / Híbrido / Remoto       | Impacto de modalidad en performance             |
+| Filtro                       | Tipo     | Valores                         | Propósito                                   |
+| ---------------------------- | -------- | ------------------------------- | -------------------------------------------- |
+| **Potencial**          | Botones  | Alto / Medio / Bajo             | Segmentar por potencial de crecimiento       |
+| **Rango Antigüedad**  | Lista    | <1, 1-3, 3-6, 6-10, 10+ años   | Correlacionar experiencia con rendimiento    |
+| **Rango Edad**         | Lista    | 18-25, 26-35, 36-45, 46-55, 56+ | Análisis generacional                       |
+| **Tipo Capacitación** | Dropdown | Interna, Externa, Mixta         | Impacto del tipo de formación en desempeño |
+| **Sexo**               | Botones  | M / F / Otro                    | Equidad en evaluaciones                      |
+| **Modalidad Trabajo**  | Botones  | Presencial / Híbrido / Remoto  | Impacto de modalidad en performance          |
 
 ### 2.3 Segmentaciones Calculadas (columnas DAX nuevas)
 
@@ -100,24 +100,24 @@ Riesgo_Fuga =
 
 ### 3.1 KPIs Primarios (Cards principales)
 
-| #  | KPI                          | Fórmula DAX                        | Formato   | Target / Benchmark    | Interpretación                          |
-| -- | ---------------------------- | ---------------------------------- | --------- | --------------------- | --------------------------------------- |
-| 1  | Evaluación Promedio          | `Evaluacion Promedio`              | ★ x/5.0  | ≥ 3.5                | Nivel general de rendimiento            |
-| 2  | % Alto Desempeño (≥4)       | `% Alto Desempeno`                 | %         | ≥ 30%                | Proporción de top performers            |
-| 3  | % Bajo Desempeño (<3)       | `% Bajo Desempeno`                 | %         | ≤ 10%                | Proporción en zona crítica              |
-| 4  | Engagement Promedio          | `Engagement Promedio`              | 0-100     | ≥ 75                 | Compromiso organizacional               |
-| 5  | Ausentismo Promedio          | `Ausentismo Promedio`              | días      | ≤ 5                  | Proxy de satisfacción / salud laboral   |
-| 6  | Tasa Accidentabilidad        | `Tasa Accidentabilidad`            | %         | ≤ 3%                 | Seguridad laboral                       |
+| # | KPI                     | Fórmula DAX              | Formato  | Target / Benchmark | Interpretación                        |
+| - | ----------------------- | ------------------------- | -------- | ------------------ | -------------------------------------- |
+| 1 | Evaluación Promedio    | `Evaluacion Promedio`   | ★ x/5.0 | ≥ 3.5             | Nivel general de rendimiento           |
+| 2 | % Alto Desempeño (≥4) | `% Alto Desempeno`      | %        | ≥ 30%             | Proporción de top performers          |
+| 3 | % Bajo Desempeño (<3)  | `% Bajo Desempeno`      | %        | ≤ 10%             | Proporción en zona crítica           |
+| 4 | Engagement Promedio     | `Engagement Promedio`   | 0-100    | ≥ 75              | Compromiso organizacional              |
+| 5 | Ausentismo Promedio     | `Ausentismo Promedio`   | días    | ≤ 5               | Proxy de satisfacción / salud laboral |
+| 6 | Tasa Accidentabilidad   | `Tasa Accidentabilidad` | %        | ≤ 3%              | Seguridad laboral                      |
 
 ### 3.2 KPIs Secundarios (Análisis profundo)
 
-| #  | KPI                              | Fórmula DAX                      | Propósito                              |
-| -- | -------------------------------- | -------------------------------- | -------------------------------------- |
-| 7  | Variación Desempeño             | `Variacion Desempeno Promedio`   | Tendencia periodo a periodo            |
-| 8  | % Mejoraron                      | `% Mejoraron Desempeno`          | Evolución positiva                     |
-| 9  | % Empeoraron                     | `% Empeoraron Desempeno`         | Señal de alerta                        |
-| 10 | 9-Box Stars                      | `9Box Stars`                     | Talento clave a retener                |
-| 11 | 9-Box Riesgo                     | `9Box Riesgo`                    | Colaboradores en zona crítica          |
+| #  | KPI                   | Fórmula DAX                     | Propósito                     |
+| -- | --------------------- | -------------------------------- | ------------------------------ |
+| 7  | Variación Desempeño | `Variacion Desempeno Promedio` | Tendencia periodo a periodo    |
+| 8  | % Mejoraron           | `% Mejoraron Desempeno`        | Evolución positiva            |
+| 9  | % Empeoraron          | `% Empeoraron Desempeno`       | Señal de alerta               |
+| 10 | 9-Box Stars           | `9Box Stars`                   | Talento clave a retener        |
+| 11 | 9-Box Riesgo          | `9Box Riesgo`                  | Colaboradores en zona crítica |
 
 ### 3.3 KPIs Avanzados (crear para el examen)
 
@@ -178,14 +178,14 @@ El análisis profundo se estructura en **4 páginas** dentro de Power BI:
 
 **Objetivo:** Vista ejecutiva del estado actual del desempeño organizacional.
 
-| Zona         | Visual                                     | Datos                                                              | Tipo Chart                       |
-| ------------ | ------------------------------------------ | ------------------------------------------------------------------ | -------------------------------- |
-| **R1**       | 6 Cards KPI                                | Eval. Promedio, % Alto, % Bajo, Engagement, Ausentismo, Accid.    | Cards con condicional color      |
-| **Centro-L** | Evaluación por Área                       | `Evaluacion Promedio` × `Area`                                   | **Clustered Bar Chart**          |
-| **Centro-R** | Distribución por Categoría de Desempeño  | `Categoria_Desempeno` count                                       | **Donut Chart**                  |
-| **Bottom-L** | Desempeño por Nivel Jerárquico           | `Evaluacion Promedio` × `Nivel`                                  | **Bar Chart** (horizontal)       |
-| **Bottom-R** | Desempeño por Sede                        | `Evaluacion Promedio` × `Sede`                                   | **Column Chart**                 |
-| **Lateral**  | Slicers: Área, Nivel, Sede, Estado         | —                                                                 | Slicers verticales               |
+| Zona               | Visual                                     | Datos                                                          | Tipo Chart                       |
+| ------------------ | ------------------------------------------ | -------------------------------------------------------------- | -------------------------------- |
+| **R1**       | 6 Cards KPI                                | Eval. Promedio, % Alto, % Bajo, Engagement, Ausentismo, Accid. | Cards con condicional color      |
+| **Centro-L** | Evaluación por Área                      | `Evaluacion Promedio` × `Area`                            | **Clustered Bar Chart**    |
+| **Centro-R** | Distribución por Categoría de Desempeño | `Categoria_Desempeno` count                                  | **Donut Chart**            |
+| **Bottom-L** | Desempeño por Nivel Jerárquico           | `Evaluacion Promedio` × `Nivel`                           | **Bar Chart** (horizontal) |
+| **Bottom-R** | Desempeño por Sede                        | `Evaluacion Promedio` × `Sede`                            | **Column Chart**           |
+| **Lateral**  | Slicers: Área, Nivel, Sede, Estado        | —                                                             | Slicers verticales               |
 
 **Storytelling:** *"¿Dónde estamos hoy? ¿Qué áreas y niveles concentran el mayor y menor desempeño?"*
 
@@ -195,13 +195,13 @@ El análisis profundo se estructura en **4 páginas** dentro de Power BI:
 
 **Objetivo:** Comparar evaluación actual vs. anterior, visualizar cómo cambiaron los rankings de cada área, e identificar patrones de mejora/deterioro.
 
-| Zona            | Visual                                           | Datos                                                                  | Tipo Chart                              |
-| --------------- | ------------------------------------------------ | ---------------------------------------------------------------------- | --------------------------------------- |
-| **R1**          | 4 Cards                                           | Δ Promedio, % Mejoraron, % Empeoraron, % Estables                     | Cards con flechas ↑↓                   |
-| **Centro-Full** | 🎀 **Ranking de Áreas: Antes vs. Ahora**        | `Evaluacion Promedio` × `Area`, con eje de categoría = Periodo       | **🎀 Ribbon Chart**                    |
-| **Bottom-L**    | Waterfall de Cambio                               | Delta por Área (contribución al cambio global)                        | **Waterfall Chart**                     |
-| **Bottom-C**    | Distribución de Tendencia                        | `Tendencia_Desempeno` count                                           | **Stacked Bar Chart** (divergente)      |
-| **Bottom-R**    | Scatter: Eval Anterior vs. Actual                 | Ejes X/Y con `Evaluacion_Anterior` vs `Evaluacion_Desempeno`         | **Scatter Plot** + línea 45°           |
+| Zona                  | Visual                                         | Datos                                                                | Tipo Chart                               |
+| --------------------- | ---------------------------------------------- | -------------------------------------------------------------------- | ---------------------------------------- |
+| **R1**          | 4 Cards                                        | Δ Promedio, % Mejoraron, % Empeoraron, % Estables                   | Cards con flechas ↑↓                   |
+| **Centro-Full** | 🎀**Ranking de Áreas: Antes vs. Ahora** | `Evaluacion Promedio` × `Area`, con eje de categoría = Periodo | **🎀 Ribbon Chart**                |
+| **Bottom-L**    | Waterfall de Cambio                            | Delta por Área (contribución al cambio global)                     | **Waterfall Chart**                |
+| **Bottom-C**    | Distribución de Tendencia                     | `Tendencia_Desempeno` count                                        | **Stacked Bar Chart** (divergente) |
+| **Bottom-R**    | Scatter: Eval Anterior vs. Actual              | Ejes X/Y con `Evaluacion_Anterior` vs `Evaluacion_Desempeno`     | **Scatter Plot** + línea 45°     |
 
 **Storytelling:** *"El Ribbon Chart revela que el Área X pasó del puesto 1 al 4 en desempeño — las cintas cruzadas muestran visualmente la magnitud del cambio. ¿Qué ocurrió allí? ¿Estamos mejorando o empeorando como organización?"*
 
@@ -215,17 +215,18 @@ El análisis profundo se estructura en **4 páginas** dentro de Power BI:
 
 **Objetivo:** Mapear talento organizacional y detectar riesgos de fuga.
 
-| Zona         | Visual                              | Datos                                                                | Tipo Chart                           |
-| ------------ | ----------------------------------- | -------------------------------------------------------------------- | ------------------------------------ |
-| **R1**       | 4 Cards                             | 9-Box Stars, 9-Box Riesgo, % Potencial Alto, % Riesgo Fuga          | Cards                                |
-| **Centro**   | Matriz 9-Box                        | Eje X: `Evaluacion_Desempeno`, Eje Y: `Potencial`, Size: Count     | **Scatter Plot** (con cuadrantes)    |
-| **Bottom-L** | Distribución por Cuadrante 9-Box   | `Cuadrante_9Box` count                                              | **Treemap**                          |
-| **Bottom-C** | Engagement por Cuadrante            | `Engagement` avg × `Cuadrante_9Box`                                | **Heatmap / Matrix** condicional     |
-| **Bottom-R** | Riesgo de Fuga por Área            | `Riesgo_Fuga` = "Alto" count × `Area`                             | **Stacked Bar** (rojo/amarillo)      |
+| Zona               | Visual                            | Datos                                                             | Tipo Chart                              |
+| ------------------ | --------------------------------- | ----------------------------------------------------------------- | --------------------------------------- |
+| **R1**       | 4 Cards                           | 9-Box Stars, 9-Box Riesgo, % Potencial Alto, % Riesgo Fuga        | Cards                                   |
+| **Centro**   | Matriz 9-Box                      | Eje X:`Evaluacion_Desempeno`, Eje Y: `Potencial`, Size: Count | **Scatter Plot** (con cuadrantes) |
+| **Bottom-L** | Distribución por Cuadrante 9-Box | `Cuadrante_9Box` count                                          | **Treemap**                       |
+| **Bottom-C** | Engagement por Cuadrante          | `Engagement` avg × `Cuadrante_9Box`                          | **Heatmap / Matrix** condicional  |
+| **Bottom-R** | Riesgo de Fuga por Área          | `Riesgo_Fuga` = "Alto" count × `Area`                        | **Stacked Bar** (rojo/amarillo)   |
 
 **Storytelling:** *"¿Quiénes son nuestras estrellas y dónde están? ¿Cuántos talentos están en riesgo de irse por bajo engagement?"*
 
 **Configuración del 9-Box en Power BI:**
+
 1. Scatter Plot con `Evaluacion_Desempeno` en X, codificación numérica de `Potencial` en Y
 2. Agregar líneas de referencia constantes en X=3 y X=4 (separar bajo/medio/alto desempeño)
 3. Agregar líneas de referencia en Y para separar bajo/medio/alto potencial
@@ -238,14 +239,14 @@ El análisis profundo se estructura en **4 páginas** dentro de Power BI:
 
 **Objetivo:** Revelar relaciones causales entre desempeño y otras variables de gestión.
 
-| Zona         | Visual                                          | Datos                                                         | Tipo Chart                    |
-| ------------ | ----------------------------------------------- | ------------------------------------------------------------- | ----------------------------- |
-| **R1**       | 3 Cards                                          | Gap Cap-Desemp, Ratio Eng/Desemp, Índice Clima               | Cards                         |
-| **Centro-L** | Capacitación vs. Desempeño                     | `Horas_Capacitacion` vs `Evaluacion_Desempeno`               | **Scatter + Trend Line**      |
-| **Centro-R** | Engagement vs. Desempeño                        | `Engagement` vs `Evaluacion_Desempeno`                        | **Scatter + Trend Line**      |
-| **Bottom-L** | Desempeño vs. Sueldo Base                       | `Sueldo_Base` × `Categoria_Desempeno`                       | **Box Plot / Violin**         |
-| **Bottom-C** | Ausentismo vs. Desempeño                        | `Ausentismo_Dias` avg × `Categoria_Desempeno`               | **Bar Chart** (invertido)     |
-| **Bottom-R** | Desempeño por Modalidad de Trabajo              | `Evaluacion Promedio` × `Modalidad_Trabajo`                  | **Column Chart**              |
+| Zona               | Visual                              | Datos                                              | Tipo Chart                      |
+| ------------------ | ----------------------------------- | -------------------------------------------------- | ------------------------------- |
+| **R1**       | 3 Cards                             | Gap Cap-Desemp, Ratio Eng/Desemp, Índice Clima    | Cards                           |
+| **Centro-L** | Capacitación vs. Desempeño        | `Horas_Capacitacion` vs `Evaluacion_Desempeno` | **Scatter + Trend Line**  |
+| **Centro-R** | Engagement vs. Desempeño           | `Engagement` vs `Evaluacion_Desempeno`         | **Scatter + Trend Line**  |
+| **Bottom-L** | Desempeño vs. Sueldo Base          | `Sueldo_Base` × `Categoria_Desempeno`         | **Box Plot / Violin**     |
+| **Bottom-C** | Ausentismo vs. Desempeño           | `Ausentismo_Dias` avg × `Categoria_Desempeno` | **Bar Chart** (invertido) |
+| **Bottom-R** | Desempeño por Modalidad de Trabajo | `Evaluacion Promedio` × `Modalidad_Trabajo`   | **Column Chart**          |
 
 **Storytelling:** *"¿La capacitación realmente mejora el desempeño? ¿Los colaboradores mejor pagados rinden más? ¿El teletrabajo afecta la performance?"*
 
@@ -459,13 +460,13 @@ Eval Sin Feedback =
 
 ## 7. Storytelling Visual — Guion de Presentación (10 min)
 
-| Min   | Página | Narrativa                                                                                              |
-| ----- | ------ | ------------------------------------------------------------------------------------------------------ |
-| 0-2   | A      | "Nuestro desempeño promedio es X/5. El Y% son top performers, pero el Z% está en zona crítica."      |
-| 2-4   | B      | "El Ribbon Chart muestra que el Área X escaló del puesto 5 al 2, mientras que Q cayó 3 posiciones. El W% mejoró globalmente." |
-| 4-6   | C      | "La Matriz 9-Box revela N estrellas. Alarmantemente, el P% de ellas tiene engagement bajo (<60)."     |
-| 6-8   | D      | "Los datos muestran que más capacitación sí correlaciona con mejor desempeño. El gap es de X hrs."   |
-| 8-10  | —      | Recomendaciones estratégicas + cierre.                                                                 |
+| Min  | Página | Narrativa                                                                                                                         |
+| ---- | ------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| 0-2  | A       | "Nuestro desempeño promedio es X/5. El Y% son top performers, pero el Z% está en zona crítica."                                |
+| 2-4  | B       | "El Ribbon Chart muestra que el Área X escaló del puesto 5 al 2, mientras que Q cayó 3 posiciones. El W% mejoró globalmente." |
+| 4-6  | C       | "La Matriz 9-Box revela N estrellas. Alarmantemente, el P% de ellas tiene engagement bajo (<60)."                                 |
+| 6-8  | D       | "Los datos muestran que más capacitación sí correlaciona con mejor desempeño. El gap es de X hrs."                            |
+| 8-10 | —      | Recomendaciones estratégicas + cierre.                                                                                           |
 
 ---
 
@@ -473,16 +474,16 @@ Eval Sin Feedback =
 
 ### Basadas en los patrones esperados del análisis:
 
-| #  | Hallazgo Probable                                          | Recomendación                                                                     | Referencia de Mercado                                      |
-| -- | ---------------------------------------------------------- | --------------------------------------------------------------------------------- | ---------------------------------------------------------- |
-| 1  | Alto desempeño + bajo engagement = riesgo de fuga          | Programa de retención diferenciado (stay interviews, bonos de retención)          | Google "gDNA" — encuestas predictivas de salida            |
-| 2  | Capacitación correlaciona con mejor desempeño             | Aumentar horas mínimas de capacitación a 40 hrs/año, focalizando en bajo desemp. | LinkedIn Learning: empresas con cultura L&D retienen 50%+  |
-| 3  | Dispersión de evaluaciones entre áreas                    | Calibración inter-áreas de evaluaciones (comités de calibración)                 | McKinsey: calibración reduce sesgo en 35%                  |
-| 4  | Bajo desempeño concentrado en ciertos niveles             | Planes de desarrollo individual (PDI) con KPIs a 90 días                          | Deloitte: "Performance Management Reimagined"              |
-| 5  | Brecha de desempeño por género                            | Auditoría de sesgo en evaluaciones + formación a evaluadores                     | Harvard BR: sesgo inconsciente en performance reviews      |
-| 6  | Ausentismo alto en áreas de bajo desempeño               | Programa de bienestar focalizado + diagnóstico de clima por área                 | Great Place to Work: bienestar reduce ausentismo en 41%    |
-| 7  | Modalidad remota con evaluaciones diferentes              | Estandarizar criterios de evaluación cross-modalidad                              | Gartner: "Hybrid Work Performance Framework"               |
-| 8  | 9-Box Riesgo (bajo desemp. + bajo potencial) concentrado | Plan de desvinculación asistida o reubicación interna                             | Proceso de gestión del talento de Unilever                 |
+| # | Hallazgo Probable                                        | Recomendación                                                                      | Referencia de Mercado                                     |
+| - | -------------------------------------------------------- | ----------------------------------------------------------------------------------- | --------------------------------------------------------- |
+| 1 | Alto desempeño + bajo engagement = riesgo de fuga       | Programa de retención diferenciado (stay interviews, bonos de retención)          | Google "gDNA" — encuestas predictivas de salida          |
+| 2 | Capacitación correlaciona con mejor desempeño          | Aumentar horas mínimas de capacitación a 40 hrs/año, focalizando en bajo desemp. | LinkedIn Learning: empresas con cultura L&D retienen 50%+ |
+| 3 | Dispersión de evaluaciones entre áreas                 | Calibración inter-áreas de evaluaciones (comités de calibración)                | McKinsey: calibración reduce sesgo en 35%                |
+| 4 | Bajo desempeño concentrado en ciertos niveles           | Planes de desarrollo individual (PDI) con KPIs a 90 días                           | Deloitte: "Performance Management Reimagined"             |
+| 5 | Brecha de desempeño por género                         | Auditoría de sesgo en evaluaciones + formación a evaluadores                      | Harvard BR: sesgo inconsciente en performance reviews     |
+| 6 | Ausentismo alto en áreas de bajo desempeño             | Programa de bienestar focalizado + diagnóstico de clima por área                  | Great Place to Work: bienestar reduce ausentismo en 41%   |
+| 7 | Modalidad remota con evaluaciones diferentes             | Estandarizar criterios de evaluación cross-modalidad                               | Gartner: "Hybrid Work Performance Framework"              |
+| 8 | 9-Box Riesgo (bajo desemp. + bajo potencial) concentrado | Plan de desvinculación asistida o reubicación interna                             | Proceso de gestión del talento de Unilever               |
 
 ---
 
